@@ -3,4 +3,5 @@
 // - useInterstitialAd.native.ts on iOS/Android
 // - useInterstitialAd.web.ts on web
 
-export { useInterstitialAd } from './useInterstitialAd.native';
+// Default to web version to prevent native module imports on web
+export { useInterstitialAd } from './useInterstitialAd.web';

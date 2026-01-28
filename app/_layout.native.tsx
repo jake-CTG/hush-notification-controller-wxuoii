@@ -16,7 +16,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import mobileAds from 'react-native-google-mobile-ads';
+import { initializeAdMob } from "@/utils/initializeAdMob";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -34,14 +34,7 @@ export default function RootLayout() {
   useEffect(() => {
     // Initialize Google Mobile Ads (native only)
     console.log('RootLayout: Initializing Google Mobile Ads');
-    mobileAds()
-      .initialize()
-      .then(adapterStatuses => {
-        console.log('Google Mobile Ads initialized:', adapterStatuses);
-      })
-      .catch(error => {
-        console.log('Error initializing Google Mobile Ads:', error);
-      });
+    initializeAdMob();
   }, []);
 
   useEffect(() => {
