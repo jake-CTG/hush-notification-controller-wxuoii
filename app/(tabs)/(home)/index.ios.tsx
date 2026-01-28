@@ -7,12 +7,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { IconSymbol } from '@/components/IconSymbol';
 import { HushLogo } from '@/components/HushLogo';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
 interface App {
   id: string;
@@ -50,6 +52,9 @@ export default function HomeScreen() {
   const { colors, isDark, themeMode, setThemeMode } = useAppTheme();
   const [apps, setApps] = useState<App[]>(mockApps);
   const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(true);
+  const [isShowingAd, setIsShowingAd] = useState(false);
+  
+  const { showAd, isAdLoaded, isAdLoading } = useInterstitialAd();
 
   const toggleAllNotifications = (value: boolean) => {
     console.log('User toggled all notifications:', value);
@@ -64,12 +69,33 @@ export default function HomeScreen() {
     ));
   };
 
-  const navigateToAppDetail = (app: App) => {
+  const navigateToAppDetail = async (app: App) => {
     console.log('User tapped on app:', app.name);
-    router.push({
-      pathname: '/app-detail',
-      params: { appId: app.id, appName: app.name, appIcon: app.icon },
-    });
+    
+    // Show interstitial ad before navigating
+    setIsShowingAd(true);
+    
+    const adShown = await showAd();
+    
+    if (adShown) {
+      console.log('Interstitial ad shown, waiting for user to close');
+      // Wait a bit for the ad to be dismissed
+      setTimeout(() => {
+        setIsShowingAd(false);
+        router.push({
+          pathname: '/app-detail',
+          params: { appId: app.id, appName: app.name, appIcon: app.icon },
+        });
+      }, 500);
+    } else {
+      console.log('Ad not shown, navigating directly');
+      setIsShowingAd(false);
+      // Navigate directly if ad couldn't be shown
+      router.push({
+        pathname: '/app-detail',
+        params: { appId: app.id, appName: app.name, appIcon: app.icon },
+      });
+    }
   };
 
   const toggleTheme = () => {
@@ -140,6 +166,7 @@ export default function HomeScreen() {
               style={[styles.appItem, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
               onPress={() => navigateToAppDetail(app)}
               activeOpacity={0.7}
+              disabled={isShowingAd}
             >
               <View style={styles.appLeft}>
                 <Text style={styles.appIcon}>{app.icon}</Text>
@@ -160,6 +187,16 @@ export default function HomeScreen() {
           );
         })}
       </ScrollView>
+
+      {/* Loading overlay when showing ad */}
+      {isShowingAd && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Loading ad...
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -263,6 +300,21 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   appName: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
     fontSize: 16,
     fontWeight: '500',
   },

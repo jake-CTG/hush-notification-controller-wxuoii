@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Hush: Notification Controller",
@@ -16,7 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.Natively",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "GADApplicationIdentifier": "ca-app-pub-4671174985752856~5400525438"
       }
     },
     "android": {
@@ -25,7 +27,8 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Natively"
+      "package": "com.anonymous.Natively",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/images/final_quest_240x240.png",
@@ -34,7 +37,14 @@
     "plugins": [
       "expo-font",
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-4671174985752856~1065694605",
+          "iosAppId": "ca-app-pub-4671174985752856~5400525438"
+        }
+      ]
     ],
     "scheme": "Hush: Notification Controller",
     "experiments": {
