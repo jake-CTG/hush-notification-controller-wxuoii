@@ -39,10 +39,11 @@ const mockApps: App[] = [
   { id: '14', name: 'Photos', icon: '🖼️', notificationsEnabled: true },
   { id: '15', name: 'Settings', icon: '⚙️', notificationsEnabled: false },
   { id: '16', name: 'Slack', icon: '💼', notificationsEnabled: true },
-  { id: '17', name: 'Twitter', icon: '🐦', notificationsEnabled: false },
-  { id: '18', name: 'Weather', icon: '🌤️', notificationsEnabled: true },
-  { id: '19', name: 'WhatsApp', icon: '💚', notificationsEnabled: true },
-  { id: '20', name: 'YouTube', icon: '📺', notificationsEnabled: false },
+  { id: '17', name: 'TikTok', icon: '🎬', notificationsEnabled: true },
+  { id: '18', name: 'Twitter', icon: '🐦', notificationsEnabled: false },
+  { id: '19', name: 'Weather', icon: '🌤️', notificationsEnabled: true },
+  { id: '20', name: 'WhatsApp', icon: '💚', notificationsEnabled: true },
+  { id: '21', name: 'YouTube', icon: '📺', notificationsEnabled: false },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function HomeScreen() {
@@ -78,6 +79,9 @@ export default function HomeScreen() {
     setThemeMode(newMode);
   };
 
+  const bellIconColor = allNotificationsEnabled ? colors.primary : colors.textSecondary;
+  const bellIconName = allNotificationsEnabled ? 'notifications' : 'notifications-off';
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
@@ -86,7 +90,7 @@ export default function HomeScreen() {
           <HushLogo size="small" color={colors.primary} />
           <View style={styles.headerTextContainer}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>HUSH</Text>
-            <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+            <Text style={[styles.headerSubtitle, { color: colors.primary }]}>
               Notification Controller
             </Text>
           </View>
@@ -104,16 +108,27 @@ export default function HomeScreen() {
 
       {/* All Notifications Toggle */}
       <View style={[styles.allToggleContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <Text style={[styles.allToggleText, { color: colors.text }]}>
-          All Notifications
-        </Text>
-        <Switch
-          value={allNotificationsEnabled}
-          onValueChange={toggleAllNotifications}
-          trackColor={{ false: colors.border, true: colors.primary }}
-          thumbColor={Platform.OS === 'ios' ? undefined : '#FFFFFF'}
-          ios_backgroundColor={colors.border}
-        />
+        <View style={styles.allToggleLeft}>
+          <IconSymbol
+            ios_icon_name={allNotificationsEnabled ? 'bell.fill' : 'bell.slash.fill'}
+            android_material_icon_name={bellIconName}
+            size={24}
+            color={bellIconColor}
+          />
+          <Text style={[styles.allToggleText, { color: colors.text }]}>
+            All Notifications
+          </Text>
+        </View>
+        <View style={[styles.customSwitch, { backgroundColor: allNotificationsEnabled ? colors.primary : colors.border }]}>
+          <TouchableOpacity
+            style={[
+              styles.customSwitchThumb,
+              allNotificationsEnabled ? styles.customSwitchThumbActive : styles.customSwitchThumbInactive
+            ]}
+            onPress={() => toggleAllNotifications(!allNotificationsEnabled)}
+            activeOpacity={0.8}
+          />
+        </View>
       </View>
 
       {/* App List */}
@@ -132,13 +147,16 @@ export default function HomeScreen() {
                 <Text style={[styles.appName, { color: colors.text }]}>{app.name}</Text>
               </View>
               
-              <Switch
-                value={appEnabled}
-                onValueChange={(value) => toggleAppNotification(app.id, value)}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={Platform.OS === 'ios' ? undefined : '#FFFFFF'}
-                ios_backgroundColor={colors.border}
-              />
+              <View style={[styles.customSwitch, { backgroundColor: appEnabled ? colors.primary : colors.border }]}>
+                <TouchableOpacity
+                  style={[
+                    styles.customSwitchThumb,
+                    appEnabled ? styles.customSwitchThumbActive : styles.customSwitchThumbInactive
+                  ]}
+                  onPress={() => toggleAppNotification(app.id, !appEnabled)}
+                  activeOpacity={0.8}
+                />
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -189,9 +207,38 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
+  allToggleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   allToggleText: {
     fontSize: 17,
     fontWeight: '600',
+  },
+  customSwitch: {
+    width: 51,
+    height: 31,
+    borderRadius: 15.5,
+    justifyContent: 'center',
+    padding: 2,
+  },
+  customSwitchThumb: {
+    width: 27,
+    height: 27,
+    borderRadius: 13.5,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  customSwitchThumbActive: {
+    alignSelf: 'flex-end',
+  },
+  customSwitchThumbInactive: {
+    alignSelf: 'flex-start',
   },
   scrollView: {
     flex: 1,
