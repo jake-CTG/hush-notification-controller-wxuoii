@@ -1,8 +1,7 @@
-
 {
   "expo": {
     "name": "Hush: Notification Controller",
-    "slug": "Hush: Notification Controller",
+    "slug": "hush-notification-controller-wxuoii",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
