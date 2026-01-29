@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   containerSmall: {
-    width: 48,
-    height: 48,
+    width: 64,
+    height: 64,
   },
   containerLarge: {
     width: 200,
@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   imageSmall: {
-    width: 48,
-    height: 48,
+    width: 64,
+    height: 64,
   },
   imageLarge: {
     width: 200,
