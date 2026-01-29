@@ -1,32 +1,21 @@
-
 {
-  "_comment": "This is an example file. Replace this with your actual google-services.json from Firebase Console",
-  "_instructions": [
-    "1. Go to Firebase Console (https://console.firebase.google.com/)",
-    "2. Select your project",
-    "3. Go to Project Settings > General",
-    "4. Under 'Your apps', find your Android app",
-    "5. Click 'Download google-services.json'",
-    "6. Replace this file with the downloaded file",
-    "7. Rename it to 'google-services.json' (remove the .example extension)"
-  ],
   "project_info": {
-    "project_number": "YOUR_PROJECT_NUMBER",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-project-id.appspot.com"
+    "project_number": "947286702792",
+    "project_id": "hush-nc",
+    "storage_bucket": "hush-nc.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
+        "mobilesdk_app_id": "1:947286702792:android:eb7d2c9e253d51a62b43fd",
         "android_client_info": {
-          "package_name": "com.CherryPi.Hush"
+          "package_name": "com.CherryPi.HUSH"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "YOUR_API_KEY"
+          "current_key": "AIzaSyAHsCbiQGNaOtSWlncDLp_7qvmtJ2-aPMA"
         }
       ],
       "services": {
