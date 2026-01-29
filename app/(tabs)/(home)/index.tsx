@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Switch,
   Platform,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,11 +17,13 @@ import { useAppTheme } from '@/contexts/ThemeContext';
 import { IconSymbol } from '@/components/IconSymbol';
 import { HushLogo } from '@/components/HushLogo';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { getInstalledApps, InstalledApp } from '@/modules/installed-apps';
 
 interface App {
   id: string;
   name: string;
   icon: string;
+  packageName?: string;
   notificationsEnabled: boolean;
 }
 
@@ -54,8 +57,52 @@ export default function HomeScreen() {
   const [apps, setApps] = useState<App[]>(mockApps);
   const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(true);
   const [isShowingAd, setIsShowingAd] = useState(false);
+  const [isLoadingApps, setIsLoadingApps] = useState(true);
   
   const { showAd, isAdLoaded, isAdLoading } = useInterstitialAd();
+
+  useEffect(() => {
+    loadInstalledApps();
+  }, []);
+
+  const loadInstalledApps = async () => {
+    console.log('Loading installed apps from device...');
+    setIsLoadingApps(true);
+    
+    try {
+      if (Platform.OS === 'android') {
+        const installedApps = await getInstalledApps();
+        
+        if (installedApps && installedApps.length > 0) {
+          console.log('Successfully loaded', installedApps.length, 'installed apps');
+          
+          const formattedApps: App[] = installedApps
+            .map((app: InstalledApp, index: number) => ({
+              id: app.packageName || `app-${index}`,
+              name: app.appName,
+              icon: app.icon, // base64 encoded icon
+              packageName: app.packageName,
+              notificationsEnabled: app.notificationsEnabled,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+          
+          setApps(formattedApps);
+        } else {
+          console.log('No installed apps found, using mock data');
+          setApps(mockApps);
+        }
+      } else {
+        console.log('iOS does not support querying installed apps, using mock data');
+        setApps(mockApps);
+      }
+    } catch (error) {
+      console.error('Error loading installed apps:', error);
+      console.log('Falling back to mock data');
+      setApps(mockApps);
+    } finally {
+      setIsLoadingApps(false);
+    }
+  };
 
   const toggleAllNotifications = (value: boolean) => {
     console.log('User toggled all notifications:', value);
@@ -73,28 +120,35 @@ export default function HomeScreen() {
   const navigateToAppDetail = async (app: App) => {
     console.log('User tapped on app:', app.name);
     
-    // Show interstitial ad before navigating
     setIsShowingAd(true);
     
     const adShown = await showAd();
     
     if (adShown) {
       console.log('Interstitial ad shown, waiting for user to close');
-      // Wait a bit for the ad to be dismissed
       setTimeout(() => {
         setIsShowingAd(false);
         router.push({
           pathname: '/app-detail',
-          params: { appId: app.id, appName: app.name, appIcon: app.icon },
+          params: { 
+            appId: app.id, 
+            appName: app.name, 
+            appIcon: app.icon,
+            packageName: app.packageName || '',
+          },
         });
       }, 500);
     } else {
       console.log('Ad not shown, navigating directly');
       setIsShowingAd(false);
-      // Navigate directly if ad couldn't be shown
       router.push({
         pathname: '/app-detail',
-        params: { appId: app.id, appName: app.name, appIcon: app.icon },
+        params: { 
+          appId: app.id, 
+          appName: app.name, 
+          appIcon: app.icon,
+          packageName: app.packageName || '',
+        },
       });
     }
   };
@@ -108,9 +162,12 @@ export default function HomeScreen() {
   const bellIconColor = allNotificationsEnabled ? colors.primary : colors.textSecondary;
   const bellIconName = allNotificationsEnabled ? 'notifications' : 'notifications-off';
 
+  const isBase64Icon = (icon: string) => {
+    return icon && icon.length > 100 && !icon.includes('://');
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
           <View style={styles.logoContainer}>
@@ -134,7 +191,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* All Notifications Toggle */}
       <View style={[styles.allToggleContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.allToggleLeft}>
           <IconSymbol
@@ -159,39 +215,55 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* App List */}
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {apps.map((app) => {
-          const appEnabled = app.notificationsEnabled;
-          return (
-            <TouchableOpacity
-              key={app.id}
-              style={[styles.appItem, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
-              onPress={() => navigateToAppDetail(app)}
-              activeOpacity={0.7}
-              disabled={isShowingAd}
-            >
-              <View style={styles.appLeft}>
-                <Text style={styles.appIcon}>{app.icon}</Text>
-                <Text style={[styles.appName, { color: colors.text }]}>{app.name}</Text>
-              </View>
-              
-              <View style={[styles.customSwitch, { backgroundColor: appEnabled ? colors.primary : colors.border }]}>
-                <TouchableOpacity
-                  style={[
-                    styles.customSwitchThumb,
-                    appEnabled ? styles.customSwitchThumbActive : styles.customSwitchThumbInactive
-                  ]}
-                  onPress={() => toggleAppNotification(app.id, !appEnabled)}
-                  activeOpacity={0.8}
-                />
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      {isLoadingApps ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Loading installed apps...
+          </Text>
+        </View>
+      ) : (
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          {apps.map((app) => {
+            const appEnabled = app.notificationsEnabled;
+            const hasBase64Icon = isBase64Icon(app.icon);
+            
+            return (
+              <TouchableOpacity
+                key={app.id}
+                style={[styles.appItem, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
+                onPress={() => navigateToAppDetail(app)}
+                activeOpacity={0.7}
+                disabled={isShowingAd}
+              >
+                <View style={styles.appLeft}>
+                  {hasBase64Icon ? (
+                    <Image 
+                      source={{ uri: `data:image/png;base64,${app.icon}` }}
+                      style={styles.appIconImage}
+                    />
+                  ) : (
+                    <Text style={styles.appIcon}>{app.icon}</Text>
+                  )}
+                  <Text style={[styles.appName, { color: colors.text }]}>{app.name}</Text>
+                </View>
+                
+                <View style={[styles.customSwitch, { backgroundColor: appEnabled ? colors.primary : colors.border }]}>
+                  <TouchableOpacity
+                    style={[
+                      styles.customSwitchThumb,
+                      appEnabled ? styles.customSwitchThumbActive : styles.customSwitchThumbInactive
+                    ]}
+                    onPress={() => toggleAppNotification(app.id, !appEnabled)}
+                    activeOpacity={0.8}
+                  />
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      )}
 
-      {/* Loading overlay when showing ad */}
       {isShowingAd && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -286,6 +358,11 @@ const styles = StyleSheet.create({
   customSwitchThumbInactive: {
     alignSelf: 'flex-start',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollView: {
     flex: 1,
   },
@@ -308,6 +385,12 @@ const styles = StyleSheet.create({
   appIcon: {
     fontSize: 32,
     marginRight: 16,
+  },
+  appIconImage: {
+    width: 40,
+    height: 40,
+    marginRight: 16,
+    borderRadius: 8,
   },
   appName: {
     fontSize: 16,

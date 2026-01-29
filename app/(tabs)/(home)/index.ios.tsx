@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Switch,
   ActivityIndicator,
+  Image,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +22,7 @@ interface App {
   id: string;
   name: string;
   icon: string;
+  packageName?: string;
   notificationsEnabled: boolean;
 }
 
@@ -53,8 +56,16 @@ export default function HomeScreen() {
   const [apps, setApps] = useState<App[]>(mockApps);
   const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(true);
   const [isShowingAd, setIsShowingAd] = useState(false);
+  const [hasShownIOSWarning, setHasShownIOSWarning] = useState(false);
   
   const { showAd, isAdLoaded, isAdLoading } = useInterstitialAd();
+
+  useEffect(() => {
+    if (!hasShownIOSWarning) {
+      console.log('iOS does not support querying installed apps due to privacy restrictions');
+      setHasShownIOSWarning(true);
+    }
+  }, [hasShownIOSWarning]);
 
   const toggleAllNotifications = (value: boolean) => {
     console.log('User toggled all notifications:', value);
@@ -72,28 +83,35 @@ export default function HomeScreen() {
   const navigateToAppDetail = async (app: App) => {
     console.log('User tapped on app:', app.name);
     
-    // Show interstitial ad before navigating
     setIsShowingAd(true);
     
     const adShown = await showAd();
     
     if (adShown) {
       console.log('Interstitial ad shown, waiting for user to close');
-      // Wait a bit for the ad to be dismissed
       setTimeout(() => {
         setIsShowingAd(false);
         router.push({
           pathname: '/app-detail',
-          params: { appId: app.id, appName: app.name, appIcon: app.icon },
+          params: { 
+            appId: app.id, 
+            appName: app.name, 
+            appIcon: app.icon,
+            packageName: app.packageName || '',
+          },
         });
       }, 500);
     } else {
       console.log('Ad not shown, navigating directly');
       setIsShowingAd(false);
-      // Navigate directly if ad couldn't be shown
       router.push({
         pathname: '/app-detail',
-        params: { appId: app.id, appName: app.name, appIcon: app.icon },
+        params: { 
+          appId: app.id, 
+          appName: app.name, 
+          appIcon: app.icon,
+          packageName: app.packageName || '',
+        },
       });
     }
   };
@@ -109,7 +127,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
           <View style={styles.logoContainer}>
@@ -133,7 +150,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* All Notifications Toggle */}
       <View style={[styles.allToggleContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.allToggleLeft}>
           <IconSymbol
@@ -158,7 +174,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* App List */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {apps.map((app) => {
           const appEnabled = app.notificationsEnabled;
@@ -190,7 +205,6 @@ export default function HomeScreen() {
         })}
       </ScrollView>
 
-      {/* Loading overlay when showing ad */}
       {isShowingAd && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.primary} />

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,14 @@ import {
   TouchableOpacity,
   Switch,
   Platform,
+  Alert,
+  Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { IconSymbol } from '@/components/IconSymbol';
+import { openAppNotificationSettings, getAppNotificationChannels, AppNotificationChannel } from '@/modules/installed-apps';
 
 interface NotificationSetting {
   id: string;
@@ -121,20 +124,82 @@ export default function AppDetailScreen() {
   
   const appName = params.appName as string;
   const appIcon = params.appIcon as string;
+  const packageName = params.packageName as string;
   
   const [settings, setSettings] = useState<NotificationSetting[]>(mockNotificationSettings);
+  const [hasRealSettings, setHasRealSettings] = useState(false);
+
+  useEffect(() => {
+    loadNotificationSettings();
+  }, [packageName]);
+
+  const loadNotificationSettings = async () => {
+    if (!packageName || Platform.OS !== 'android') {
+      console.log('Cannot load real notification settings - using mock data');
+      return;
+    }
+
+    try {
+      console.log('Attempting to load notification channels for', packageName);
+      const channels = await getAppNotificationChannels(packageName);
+      
+      if (channels && channels.length > 0) {
+        console.log('Loaded', channels.length, 'notification channels');
+        
+        const formattedSettings: NotificationSetting[] = channels.map((channel: AppNotificationChannel) => ({
+          id: channel.id,
+          title: channel.name,
+          description: channel.description || 'Notification channel',
+          enabled: channel.enabled,
+        }));
+        
+        setSettings(formattedSettings);
+        setHasRealSettings(true);
+      } else {
+        console.log('No notification channels found, showing system settings option');
+      }
+    } catch (error) {
+      console.error('Error loading notification channels:', error);
+    }
+  };
 
   const toggleSetting = (settingId: string, value: boolean) => {
     console.log('User toggled setting:', settingId, 'to:', value);
-    setSettings(settings.map(setting =>
-      setting.id === settingId ? { ...setting, enabled: value } : setting
-    ));
+    
+    if (hasRealSettings && packageName && Platform.OS === 'android') {
+      console.log('Opening system notification settings for', packageName);
+      openAppNotificationSettings(packageName);
+    } else {
+      setSettings(settings.map(setting =>
+        setting.id === settingId ? { ...setting, enabled: value } : setting
+      ));
+    }
   };
 
   const handleClose = () => {
     console.log('User tapped close button');
     router.back();
   };
+
+  const openSystemSettings = () => {
+    console.log('User requested to open system notification settings');
+    
+    if (packageName && Platform.OS === 'android') {
+      openAppNotificationSettings(packageName);
+    } else {
+      Alert.alert(
+        'System Settings',
+        'Please open your device Settings app to manage notification settings for this app.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const isBase64Icon = (icon: string) => {
+    return icon && icon.length > 100 && !icon.includes('://');
+  };
+
+  const hasBase64Icon = isBase64Icon(appIcon);
 
   return (
     <>
@@ -144,10 +209,16 @@ export default function AppDetailScreen() {
         }}
       />
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-        {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
           <View style={styles.headerLeft}>
-            <Text style={styles.appIcon}>{appIcon}</Text>
+            {hasBase64Icon ? (
+              <Image 
+                source={{ uri: `data:image/png;base64,${appIcon}` }}
+                style={styles.appIconImage}
+              />
+            ) : (
+              <Text style={styles.appIcon}>{appIcon}</Text>
+            )}
             <Text style={[styles.appName, { color: colors.text }]}>{appName}</Text>
           </View>
           
@@ -161,8 +232,38 @@ export default function AppDetailScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Settings List */}
+        {packageName && Platform.OS === 'android' && (
+          <TouchableOpacity 
+            style={[styles.systemSettingsButton, { backgroundColor: colors.primary }]}
+            onPress={openSystemSettings}
+          >
+            <IconSymbol
+              ios_icon_name="gear"
+              android_material_icon_name="settings"
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.systemSettingsText}>
+              Open System Notification Settings
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.infoBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <IconSymbol
+              ios_icon_name="info.circle"
+              android_material_icon_name="info"
+              size={20}
+              color={colors.primary}
+            />
+            <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+              {Platform.OS === 'android' 
+                ? 'Tap the button above to manage this app\'s notification settings in your device settings. Android restricts apps from directly modifying other apps\' notification settings for security reasons.'
+                : 'iOS does not allow apps to access or modify notification settings for other apps. Please use the Settings app to manage notifications.'}
+            </Text>
+          </View>
+
           {settings.map((setting) => {
             const settingEnabled = setting.enabled;
             return (
@@ -185,6 +286,7 @@ export default function AppDetailScreen() {
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor={Platform.OS === 'ios' ? undefined : '#FFFFFF'}
                   ios_backgroundColor={colors.border}
+                  disabled={packageName && Platform.OS === 'android'}
                 />
               </View>
             );
@@ -216,12 +318,48 @@ const styles = StyleSheet.create({
     fontSize: 32,
     marginRight: 12,
   },
+  appIconImage: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+    borderRadius: 8,
+  },
   appName: {
     fontSize: 20,
     fontWeight: '700',
   },
   closeButton: {
     padding: 8,
+  },
+  systemSettingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginVertical: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 8,
+  },
+  systemSettingsText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
   },
   scrollView: {
     flex: 1,

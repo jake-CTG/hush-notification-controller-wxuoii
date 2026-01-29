@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Hush: Notification Controller",
@@ -39,7 +40,8 @@
       "minSdkVersion": 24,
       "permissions": [
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "QUERY_ALL_PACKAGES"
       ],
       "gradleVersion": "9.0",
       "androidGradlePluginVersion": "8.7.3"
@@ -58,7 +60,8 @@
           "androidAppId": "ca-app-pub-4671174985752856~1065694605",
           "iosAppId": "ca-app-pub-4671174985752856~5400525438"
         }
-      ]
+      ],
+      "./app.plugin.js"
     ],
     "scheme": "Hush: Notification Controller",
     "experiments": {
