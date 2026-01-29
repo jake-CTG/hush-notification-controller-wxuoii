@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Hush: Notification Controller",
@@ -33,14 +34,16 @@
       "edgeToEdgeEnabled": true,
       "package": "com.CherryPi.HUSH",
       "googleServicesFile": "./google-services.json",
-      "compileSdkVersion": 34,
-      "targetSdkVersion": 34,
-      "buildToolsVersion": "34.0.0",
-      "minSdkVersion": 23,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "buildToolsVersion": "35.0.0",
+      "minSdkVersion": 24,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "gradleVersion": "9.0",
+      "androidGradlePluginVersion": "8.7.3"
     },
     "web": {
       "favicon": "./assets/images/natively-dark.png",
