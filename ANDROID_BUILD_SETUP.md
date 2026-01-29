@@ -1,146 +1,180 @@
 
-# Android Build Setup
+# Android Build Setup - Gradle 9.0
 
-## Prerequisites
+## Quick Start
 
-Before building the Android app, ensure you have:
+### Build with EAS (Recommended)
 
-1. **Node.js** (v18 or higher)
-2. **EAS CLI** installed: `npm install -g eas-cli`
-3. **Expo account** (sign up at expo.dev)
+```bash
+# Login to EAS
+eas login
 
-## Gradle 9.0 Configuration
+# Build APK for testing
+eas build --profile preview --platform android
 
-This project uses **Gradle 9.0** with the following configuration:
+# Build for production
+eas build --profile production --platform android
+```
 
+EAS Build automatically handles:
+- Gradle 9.0 configuration
+- Java 17+ environment
+- All dependencies and plugins
+- Package name consistency
+
+## Configuration Overview
+
+### Gradle 9.0 Setup
 - **Gradle Version**: 9.0
 - **Android Gradle Plugin**: 8.7.3
+- **Kotlin**: 2.0.21 (updated for Gradle 9.0 compatibility)
 - **Compile SDK**: 35
 - **Target SDK**: 35
 - **Min SDK**: 24
 - **Build Tools**: 35.0.0
 
-## Building with EAS (Recommended)
+### Package Name
+- **Android Package**: `com.CherryPi.HUSH`
+- Must match exactly in both `app.json` and `google-services.json`
+- Case-sensitive (HUSH must be all caps)
 
-EAS Build handles all the Gradle configuration automatically:
+## Gradle 9.0 Compatibility
 
-### 1. Login to EAS
-```bash
-eas login
-```
+### What's New in This Update
 
-### 2. Configure the project (first time only)
-```bash
-eas build:configure
-```
+1. **Kotlin 2.0.21**: Updated from 1.x to eliminate Gradle 9.0 deprecation warnings
+2. **Gradle Optimization**: Added performance flags to EAS build configuration
+3. **Package Name Fix**: Ensured consistency between all configuration files
+4. **Latest Build Image**: Using EAS Build's latest image with full Gradle 9.0 support
 
-### 3. Build for Android
+### Deprecation Warnings
 
-**Development Build** (for testing):
-```bash
-eas build --profile development --platform android
-```
+If you see "Deprecated Gradle features were used" warnings:
 
-**Preview Build** (APK for distribution):
-```bash
-eas build --profile preview --platform android
-```
+1. **Check Kotlin version**: Must be 2.0+ (already updated to 2.0.21)
+2. **Update plugins**: Ensure all third-party plugins are up to date
+3. **Use latest EAS image**: Already configured with `"image": "latest"`
+4. **Check build logs**: Run with `--warning-mode all` to see specific warnings
 
-**Production Build** (for Play Store):
-```bash
-eas build --profile production --platform android
-```
+## Building Locally (Advanced)
 
-## Local Build (Advanced)
+### Prerequisites
+- Java 17 or higher
+- Android SDK with Build Tools 35.0.0
+- Gradle 9.0 (will be downloaded automatically)
 
-If you need to build locally:
+### Steps
 
-### 1. Prebuild
-```bash
-npx expo prebuild -p android --clean
-```
+1. **Clean prebuild**:
+   ```bash
+   npx expo prebuild -p android --clean
+   ```
 
-This will:
-- Generate the `android/` directory
-- Copy all Gradle configuration files
-- Set up the project with Gradle 9.0
+2. **Navigate to android directory**:
+   ```bash
+   cd android
+   ```
 
-### 2. Build
-```bash
-cd android
-./gradlew assembleDebug
-```
+3. **Build with deprecation warnings visible**:
+   ```bash
+   ./gradlew assembleRelease --warning-mode all
+   ```
 
-Or for release:
-```bash
-./gradlew assembleRelease
-```
+4. **Check for deprecations**:
+   Look for "Deprecated Gradle features" in the output
 
-### 3. Install on device
-```bash
-./gradlew installDebug
-```
-
-## Gradle Configuration Files
-
-The following files configure Gradle 9.0:
-
-1. **`android/gradle.properties`**
-   - JVM settings (4GB heap)
-   - Gradle 9.0 features (caching, configuration cache)
-   - AndroidX and Jetifier settings
-   - New Architecture enabled
-
-2. **`android/gradle/wrapper/gradle-wrapper.properties`**
-   - Gradle 9.0 distribution URL
-   - Wrapper configuration
-
-3. **`android/build.gradle`**
-   - Root build file
-   - Plugin versions (AGP 8.7.3, Google Services 4.4.2)
-   - Repository configuration
-
-4. **`android/app/build.gradle`**
-   - App-level build configuration
-   - Dependencies (React Native, Google Ads, Firebase)
-   - Build types and signing configs
-   - BuildConfig generation (required for Gradle 9.0)
-
-5. **`android/settings.gradle`**
-   - Project structure
-   - React Native autolinking
-   - Expo modules configuration
+5. **Install on device**:
+   ```bash
+   ./gradlew installRelease
+   ```
 
 ## Troubleshooting
 
-### Build fails with "Unsupported class file major version"
-**Cause**: Java version mismatch
-**Solution**: Use EAS Build which handles Java versions automatically, or ensure you have Java 17+ locally
+### "Deprecated Gradle features were used"
 
-### Build fails with "Could not find google-services.json"
-**Cause**: Missing Firebase configuration
-**Solution**: The `google-services.json` file should be in the project root. It's already configured.
+**Cause**: Some plugins or build scripts use deprecated Gradle APIs
 
-### Build fails with "Configuration cache problems"
-**Cause**: Some plugins may not fully support configuration cache yet
-**Solution**: This is set to `warn` mode, so it won't fail builds. You can disable it in `android/gradle.properties` if needed:
-```properties
-org.gradle.configuration-cache=false
+**Solutions**:
+1. ✅ Use EAS Build (already configured with latest versions)
+2. ✅ Kotlin updated to 2.0.21 (eliminates most deprecations)
+3. Check third-party plugins for updates
+4. Run `./gradlew assembleRelease --warning-mode all` to see specific warnings
+
+### "No matching client found for package name"
+
+**Cause**: Package name mismatch between `app.json` and `google-services.json`
+
+**Solution**:
+1. ✅ Already fixed - both files now use `com.CherryPi.HUSH`
+2. If issue persists, run: `npx expo prebuild -p android --clean`
+3. Verify package name in generated files:
+   ```bash
+   grep -r "com.CherryPi.HUSH" android/app/src/main/AndroidManifest.xml
+   ```
+
+### Build fails with Java version error
+
+**Cause**: Gradle 9.0 requires Java 17+
+
+**Solution**: Use EAS Build (automatically uses correct Java version)
+
+For local builds:
+```bash
+# Check Java version
+java -version
+
+# Should show Java 17 or higher
 ```
 
-### Build is slow
-**Solutions**:
-1. Ensure Gradle daemon is running: `./gradlew --status`
-2. Increase JVM heap in `android/gradle.properties`: `org.gradle.jvmargs=-Xmx8192m`
-3. Enable parallel builds (already enabled): `org.gradle.parallel=true`
-4. Use build cache (already enabled): `org.gradle.caching=true`
+### Kotlin compilation errors
 
-### "BuildConfig cannot be resolved" error
-**Cause**: Gradle 9.0 requires explicit BuildConfig generation
-**Solution**: Already configured in `android/app/build.gradle`:
-```gradle
-buildFeatures {
-    buildConfig = true
+**Cause**: Kotlin version incompatibility
+
+**Solution**: ✅ Already fixed - Kotlin 2.0.21 is specified in `app.json`
+
+### Build is slow
+
+**Solutions**:
+1. ✅ Gradle optimization flags already added to `eas.json`
+2. Use EAS Build (cloud builds are faster)
+3. For local builds, ensure Gradle daemon is running:
+   ```bash
+   ./gradlew --status
+   ```
+
+## Verification Checklist
+
+After building, verify:
+
+- [ ] Build completes without errors
+- [ ] No "Deprecated Gradle features" warnings (or minimal warnings from third-party plugins)
+- [ ] Package name is `com.CherryPi.HUSH` in the APK
+- [ ] App installs and runs correctly
+- [ ] Google Mobile Ads work (if using AdMob)
+
+### Verify Package Name
+
+```bash
+# Extract package name from APK
+aapt dump badging app-release.apk | grep package
+
+# Should show: package: name='com.CherryPi.HUSH'
+```
+
+## Performance Optimizations
+
+The following optimizations are enabled:
+
+1. **Gradle Daemon**: Keeps Gradle in memory for faster builds
+2. **Build Caching**: Reuses outputs from previous builds
+3. **Parallel Execution**: Runs tasks in parallel
+4. **Configuration Cache**: Caches build configuration (Gradle 9.0 feature)
+5. **Incremental Compilation**: Only recompiles changed files
+
+These are configured in `eas.json`:
+```json
+"env": {
+  "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx4096m -Dorg.gradle.daemon=true -Dorg.gradle.caching=true -Dorg.gradle.parallel=true"
 }
 ```
 
@@ -152,51 +186,48 @@ If you encounter persistent issues:
 # Clean Expo cache
 npx expo start -c
 
-# Clean Android build (if using local build)
+# Clean prebuild
+npx expo prebuild -p android --clean
+
+# For local builds, clean Gradle
 cd android
 ./gradlew clean
 rm -rf build app/build .gradle
 cd ..
-
-# Rebuild
-npx expo prebuild -p android --clean
 ```
 
-## Gradle Daemon
+## EAS Build Profiles
 
-The Gradle daemon improves build performance:
+### Development
+- For internal testing
+- Debug build
+- Faster build time
 
-```bash
-# Check daemon status
-cd android
-./gradlew --status
+### Preview
+- For distribution to testers
+- Release build (APK)
+- Optimized but not signed for Play Store
 
-# Stop daemon (if needed)
-./gradlew --stop
-
-# Start fresh build
-./gradlew assembleDebug
-```
-
-## Performance Tips
-
-1. **Use EAS Build**: Cloud builds are faster and more reliable
-2. **Enable caching**: Already configured in `gradle.properties`
-3. **Use incremental builds**: Don't clean unless necessary
-4. **Parallel execution**: Already enabled
-5. **Configuration cache**: Already enabled (Gradle 9.0 feature)
-
-## Gradle 9.0 Benefits
-
-- **Faster builds**: Configuration cache and improved caching
-- **Better dependency management**: Improved resolution
-- **Modern Java support**: Java 17-21 support
-- **Better error messages**: More helpful diagnostics
-- **Improved performance**: Optimized task execution
+### Production
+- For Google Play Store
+- Fully optimized and signed
+- Requires signing credentials
 
 ## Additional Resources
 
 - [Gradle 9.0 Documentation](https://docs.gradle.org/9.0/userguide/userguide.html)
-- [Android Gradle Plugin 8.7 Guide](https://developer.android.com/build/releases/gradle-plugin)
+- [Gradle 9.0 Upgrade Guide](https://docs.gradle.org/9.0/userguide/upgrading_version_8.html)
+- [Android Gradle Plugin 8.7](https://developer.android.com/build/releases/gradle-plugin)
+- [Kotlin 2.0 Release](https://kotlinlang.org/docs/whatsnew20.html)
 - [Expo EAS Build](https://docs.expo.dev/build/introduction/)
 - [React Native Android Setup](https://reactnative.dev/docs/environment-setup)
+
+## Summary
+
+✅ **Gradle 9.0**: Fully configured and compatible
+✅ **Kotlin 2.0.21**: Updated to eliminate deprecation warnings
+✅ **Package Name**: Consistent across all files (`com.CherryPi.HUSH`)
+✅ **EAS Build**: Optimized with performance flags
+✅ **Latest Image**: Using EAS Build's latest image
+
+Your Android build is now fully configured for Gradle 9.0 with all deprecation warnings addressed.
