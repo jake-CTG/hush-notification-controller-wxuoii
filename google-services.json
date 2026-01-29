@@ -1,38 +1,26 @@
-
 {
   "project_info": {
-    "project_number": "123456789000",
-    "firebase_url": "https://your-project-id.firebaseio.com",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-project-id.appspot.com"
+    "project_number": "947286702792",
+    "project_id": "hush-nc",
+    "storage_bucket": "hush-nc.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789000:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:947286702792:android:eb7d2c9e253d51a62b43fd",
         "android_client_info": {
-          "package_name": "com.CherryPi.Hush"
+          "package_name": "com.CherryPi.HUSH"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "123456789000-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForPlaceholderPurposes123456"
+          "current_key": "AIzaSyAHsCbiQGNaOtSWlncDLp_7qvmtJ2-aPMA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "123456789000-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
