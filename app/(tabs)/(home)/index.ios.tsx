@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingRight: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
     overflow: 'hidden',
@@ -225,10 +225,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     height: 56,
     justifyContent: 'center',
+    marginLeft: 4,
   },
   headerTextContainer: {
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 72,
   },
   headerTitle: {
     fontSize: 20,
