@@ -16,7 +16,7 @@ function resolveImageSource(source: string | number | ImageSourcePropType | unde
 
 export function HushLogo({ size = 'large', color }: HushLogoProps) {
   const isSmall = size === 'small';
-  const logoSource = require('@/assets/images/final_quest_240x240.png');
+  const logoSource = require('@/assets/images/de3bec55-3937-4228-bfc0-b991dbb3ca3e.png');
   
   return (
     <View style={[

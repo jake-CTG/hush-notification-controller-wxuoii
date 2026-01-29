@@ -5,7 +5,7 @@
     "slug": "hush-notification-controller-wxuoii",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/final_quest_240x240.png",
+    "icon": "./assets/images/de3bec55-3937-4228-bfc0-b991dbb3ca3e.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "platforms": [
@@ -14,7 +14,7 @@
       "web"
     ],
     "splash": {
-      "image": "./assets/images/final_quest_240x240.png",
+      "image": "./assets/images/de3bec55-3937-4228-bfc0-b991dbb3ca3e.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -28,7 +28,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/final_quest_240x240.png",
+        "foregroundImage": "./assets/images/de3bec55-3937-4228-bfc0-b991dbb3ca3e.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
@@ -46,7 +46,7 @@
       "androidGradlePluginVersion": "8.7.3"
     },
     "web": {
-      "favicon": "./assets/images/final_quest_240x240.png",
+      "favicon": "./assets/images/de3bec55-3937-4228-bfc0-b991dbb3ca3e.png",
       "bundler": "metro"
     },
     "plugins": [
