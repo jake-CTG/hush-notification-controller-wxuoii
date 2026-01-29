@@ -1,92 +1,77 @@
 
-# 🔧 Google Services Setup - REQUIRED FOR APK BUILD
+# Google Services Configuration
 
-## ✅ Issue Resolved
-A placeholder `google-services.json` file has been created to allow your APK build to proceed.
+## ⚠️ IMPORTANT: Replace Placeholder File
 
-## 📋 What You Need to Do
+The `google-services.json` file in this project is a **PLACEHOLDER** with dummy values. You **MUST** replace it with your actual Firebase configuration before deploying to production.
 
-### Option 1: Use AdMob/Firebase (Recommended if you want ads)
+## Why This File Exists
 
-1. **Create a Firebase Project:**
-   - Go to https://console.firebase.google.com/
-   - Click "Add project" or select existing project
-   - Follow the setup wizard
+- The Android build process requires `google-services.json` to exist
+- This placeholder prevents build errors during development
+- The file is excluded from Git (listed in `.gitignore`) to protect sensitive API keys
 
-2. **Add Your Android App:**
-   - In Firebase Console, click "Add app" → Select Android (robot icon)
-   - **Package name:** `com.CherryPi.Hush` (MUST match exactly)
-   - **App nickname:** Hush Notification Controller (optional)
-   - Click "Register app"
+## How to Get Your Real google-services.json
 
-3. **Download google-services.json:**
-   - Firebase will generate your configuration file
-   - Click "Download google-services.json"
-   - **Replace** the placeholder file in your project root with this downloaded file
+### Step 1: Go to Firebase Console
+1. Visit https://console.firebase.google.com/
+2. Select your project (or create a new one)
 
-4. **Verify the Configuration:**
-   - Open the downloaded `google-services.json`
-   - Check that `"package_name": "com.CherryPi.Hush"` matches your app
-   - Check that `"admob_app_id"` matches: `ca-app-pub-4671174985752856~1065694605`
+### Step 2: Add Android App (if not already added)
+1. Click the gear icon ⚙️ next to "Project Overview"
+2. Select "Project settings"
+3. Scroll to "Your apps" section
+4. Click "Add app" → Select Android icon
+5. Enter your package name: `com.CherryPi.Hush`
+6. Register the app
 
-5. **Build Your APK:**
-   ```bash
-   eas build -p android
-   ```
+### Step 3: Download google-services.json
+1. After registering, Firebase will offer to download `google-services.json`
+2. If you already registered the app, go to Project Settings → Your apps → Select your Android app
+3. Click "Download google-services.json"
 
-### Option 2: Remove Google Services (If you don't need Firebase/AdMob)
+### Step 4: Replace the Placeholder
+1. Download the `google-services.json` file from Firebase
+2. Replace the placeholder file in your project root with the downloaded file
+3. **DO NOT commit this file to Git** - it's already in `.gitignore`
 
-If you're not using Firebase features or AdMob:
+## Verification
 
-1. **Remove from app.json:**
-   Open `app.json` and remove this line from the android section:
-   ```json
-   "googleServicesFile": "./google-services.json",
-   ```
+After replacing the placeholder, your `google-services.json` should have:
+- Your actual `project_id` (not "your-project-id")
+- Your actual `mobilesdk_app_id` (not the dummy one)
+- Your actual `api_key` (not "AIzaSyDummyKeyForPlaceholderPurposes123456")
+- Your package name: `com.CherryPi.Hush`
 
-2. **Remove AdMob Plugin:**
-   Also remove the `react-native-google-mobile-ads` plugin from the plugins array in `app.json`
+## Security Notes
 
-3. **Delete the file:**
-   ```bash
-   rm google-services.json
-   ```
+✅ **SAFE:** The placeholder file with dummy values (safe to keep in Git)
+❌ **UNSAFE:** Your real Firebase configuration (contains sensitive API keys)
 
-4. **Remove AdMob code from your app:**
-   - Delete `utils/admobConfig.ts`
-   - Delete `utils/initializeAdMob.native.ts`
-   - Delete `hooks/useInterstitialAd.native.ts`
-   - Remove AdMob initialization from `app/_layout.native.tsx`
+The `.gitignore` file is configured to exclude `google-services.json` from version control, protecting your sensitive Firebase credentials.
 
-## 🔒 Security Notes
+## Build Process
 
-- ✅ `google-services.json` is already in `.gitignore`
-- ❌ **NEVER** commit the real file to GitHub (it contains API keys)
-- ✅ Each team member should download their own copy from Firebase Console
-- ✅ The placeholder file is safe to commit (contains dummy values)
+The placeholder file allows the build to succeed without errors. However, Firebase features (like Analytics, Cloud Messaging, etc.) will NOT work until you replace it with your real configuration.
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-**Error: "Cannot copy google-services.json"**
-- ✅ Fixed! The placeholder file now exists
-- If you still see this error, ensure the file is in your project root (same folder as `app.json`)
+**Q: The file keeps disappearing after builds**
+A: This is now fixed. The file exists in the project root and is excluded from Git via `.gitignore`. It will persist across builds.
 
-**Error: "Package name mismatch"**
-- Open `google-services.json` and verify `"package_name": "com.CherryPi.Hush"`
-- This must match the `"package"` value in `app.json` under `android`
+**Q: I'm getting "Cannot copy google-services.json" errors**
+A: Make sure the file exists in the project root (same directory as `app.json`). The placeholder file should prevent this error.
 
-**Build succeeds but ads don't show:**
-- You're using the placeholder file with dummy values
-- Replace it with your real `google-services.json` from Firebase Console
-- Ensure you've set up AdMob in the Firebase Console
+**Q: Do I need this for iOS?**
+A: No, iOS uses `GoogleService-Info.plist` instead. That file is also excluded from Git via `.gitignore`.
 
-## 📱 Current Configuration
+## Next Steps
 
-- **Package Name:** `com.CherryPi.Hush`
-- **AdMob App ID (Android):** `ca-app-pub-4671174985752856~1065694605`
-- **AdMob App ID (iOS):** `ca-app-pub-4671174985752856~5400525438`
+1. ✅ Placeholder file created (allows builds to succeed)
+2. ⏳ Replace with real Firebase config (required for production)
+3. ✅ File excluded from Git (protects sensitive data)
+4. ✅ Build process configured (references correct path)
 
 ---
 
-**Status:** ✅ Placeholder file created - Build will now proceed
-**Next Step:** Replace with real file from Firebase Console before production release
+**Remember:** The placeholder file is for development only. Replace it with your real Firebase configuration before deploying to production or using Firebase features.
