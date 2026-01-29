@@ -1,7 +1,7 @@
 
 {
   "expo": {
-    "name": "Hush: Notification Controller",
+    "name": "HUSH",
     "slug": "hush-notification-controller-wxuoii",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -61,7 +61,7 @@
         }
       ]
     ],
-    "scheme": "Hush: Notification Controller",
+    "scheme": "hush",
     "experiments": {
       "typedRoutes": true
     },

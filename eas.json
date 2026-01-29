@@ -9,6 +9,9 @@
         "gradleCommand": ":app:assembleDebug",
         "buildType": "apk",
         "image": "latest",
+        "cache": {
+          "disabled": true
+        },
         "env": {
           "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx4096m -Dorg.gradle.daemon=true -Dorg.gradle.caching=true -Dorg.gradle.parallel=true"
         }
@@ -21,6 +24,9 @@
         "gradleCommand": ":app:assembleRelease",
         "buildType": "apk",
         "image": "latest",
+        "cache": {
+          "disabled": true
+        },
         "env": {
           "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx4096m -Dorg.gradle.daemon=true -Dorg.gradle.caching=true -Dorg.gradle.parallel=true"
         }
@@ -31,6 +37,9 @@
       "android": {
         "buildType": "apk",
         "image": "latest",
+        "cache": {
+          "disabled": true
+        },
         "env": {
           "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx4096m -Dorg.gradle.daemon=true -Dorg.gradle.caching=true -Dorg.gradle.parallel=true"
         }
