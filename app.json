@@ -1,8 +1,8 @@
 
 {
   "expo": {
-    "name": "HUSH",
-    "slug": "hush-notification-controller-wxuoii",
+    "name": "Hush: Notification Controller",
+    "slug": "Hush: Notification Controller",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -32,7 +32,7 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.CherryPi.HUSH",
+      "package": "com.cherrypi.hush",
       "googleServicesFile": "./google-services.json",
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
@@ -61,7 +61,7 @@
         }
       ]
     ],
-    "scheme": "hush",
+    "scheme": "Hush: Notification Controller",
     "experiments": {
       "typedRoutes": true
     },
