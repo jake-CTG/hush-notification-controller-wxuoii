@@ -49,7 +49,7 @@ export default function SplashScreen() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [scaleAnim, positionAnim, opacityAnim, router]);
 
   const translateX = positionAnim.interpolate({
     inputRange: [0, 1],

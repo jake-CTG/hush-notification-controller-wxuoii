@@ -1,14 +1,17 @@
-
 {
   "expo": {
     "name": "Hush: Notification Controller",
-    "slug": "hush-notification-controller-wxuoii",
+    "slug": "Hush: Notification Controller",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "splash": {
       "image": "./assets/images/natively-dark.png",
       "resizeMode": "contain",
