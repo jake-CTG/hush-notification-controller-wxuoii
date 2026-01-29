@@ -39,6 +39,9 @@ package-lock.json
 # Chat history contains presigned URLs that get flagged by GitHub
 chat_history.json
 
-# Google Services files (contain sensitive API keys)
-google-services.json
+# Google Services files for iOS (contains sensitive API keys)
 GoogleService-Info.plist
+
+# NOTE: google-services.json is NOT ignored - we keep a placeholder in the repo
+# This allows Android builds to succeed without errors
+# Replace with your real Firebase config for production
