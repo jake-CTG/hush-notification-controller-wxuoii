@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     justifyContent: 'center',
-    marginLeft: 20,
+    marginLeft: 16,
   },
   headerTitle: {
     fontSize: 20,
