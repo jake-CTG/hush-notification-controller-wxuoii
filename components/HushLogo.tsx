@@ -1,27 +1,36 @@
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, ImageSourcePropType } from 'react-native';
 
 interface HushLogoProps {
   size?: 'small' | 'large';
   color?: string;
 }
 
-export function HushLogo({ size = 'large', color = '#A855F7' }: HushLogoProps) {
+// Helper to resolve image sources (handles both local require() and remote URLs)
+function resolveImageSource(source: string | number | ImageSourcePropType | undefined): ImageSourcePropType {
+  if (!source) return { uri: '' };
+  if (typeof source === 'string') return { uri: source };
+  return source as ImageSourcePropType;
+}
+
+export function HushLogo({ size = 'large', color }: HushLogoProps) {
   const isSmall = size === 'small';
+  const logoSource = require('@/assets/images/final_quest_240x240.png');
   
   return (
     <View style={[
       styles.container,
-      isSmall ? styles.containerSmall : styles.containerLarge,
-      { backgroundColor: color }
+      isSmall ? styles.containerSmall : styles.containerLarge
     ]}>
-      <Text style={[
-        styles.text,
-        isSmall ? styles.textSmall : styles.textLarge
-      ]}>
-        HUSH
-      </Text>
+      <Image
+        source={resolveImageSource(logoSource)}
+        style={[
+          styles.image,
+          isSmall ? styles.imageSmall : styles.imageLarge
+        ]}
+        resizeMode="contain"
+      />
     </View>
   );
 }
@@ -30,27 +39,25 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
   },
   containerSmall: {
     width: 40,
-    height: 80,
+    height: 40,
   },
   containerLarge: {
-    width: 300,
-    height: 600,
+    width: 200,
+    height: 200,
   },
-  text: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    letterSpacing: 2,
+  image: {
+    width: '100%',
+    height: '100%',
   },
-  textSmall: {
-    fontSize: 12,
-    transform: [{ rotate: '90deg' }],
+  imageSmall: {
+    width: 40,
+    height: 40,
   },
-  textLarge: {
-    fontSize: 48,
-    transform: [{ rotate: '90deg' }],
+  imageLarge: {
+    width: 200,
+    height: 200,
   },
 });

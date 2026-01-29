@@ -1,16 +1,23 @@
 
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '@/contexts/ThemeContext';
-import { HushLogo } from '@/components/HushLogo';
+
+// Helper to resolve image sources (handles both local require() and remote URLs)
+function resolveImageSource(source: string | number | ImageSourcePropType | undefined): ImageSourcePropType {
+  if (!source) return { uri: '' };
+  if (typeof source === 'string') return { uri: source };
+  return source as ImageSourcePropType;
+}
 
 export default function SplashScreen() {
   const router = useRouter();
   const { colors } = useAppTheme();
   
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const positionAnim = useRef(new Animated.Value(0)).current;
+  const translateXAnim = useRef(new Animated.Value(0)).current;
+  const translateYAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -18,19 +25,25 @@ export default function SplashScreen() {
     
     // Wait 3 seconds, then animate
     const timer = setTimeout(() => {
-      console.log('SplashScreen: Starting shrink animation');
+      console.log('SplashScreen: Starting shrink animation to top left');
       
       Animated.parallel([
         // Shrink the logo
         Animated.timing(scaleAnim, {
-          toValue: 0.15,
+          toValue: 0.2,
           duration: 800,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           useNativeDriver: true,
         }),
-        // Move to top left
-        Animated.timing(positionAnim, {
-          toValue: 1,
+        // Move to top left (negative values move left and up)
+        Animated.timing(translateXAnim, {
+          toValue: -140,
+          duration: 800,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateYAnim, {
+          toValue: -320,
           duration: 800,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           useNativeDriver: true,
@@ -49,17 +62,9 @@ export default function SplashScreen() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [scaleAnim, positionAnim, opacityAnim, router]);
+  }, [scaleAnim, translateXAnim, translateYAnim, opacityAnim, router]);
 
-  const translateX = positionAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -120],
-  });
-
-  const translateY = positionAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -280],
-  });
+  const logoSource = require('@/assets/images/final_quest_240x240.png');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -73,13 +78,17 @@ export default function SplashScreen() {
           {
             transform: [
               { scale: scaleAnim },
-              { translateX },
-              { translateY },
+              { translateX: translateXAnim },
+              { translateY: translateYAnim },
             ],
           },
         ]}
       >
-        <HushLogo size="large" color={colors.primary} />
+        <Image
+          source={resolveImageSource(logoSource)}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
       </Animated.View>
     </View>
   );
@@ -99,9 +108,13 @@ const styles = StyleSheet.create({
     opacity: 0.1,
   },
   logoContainer: {
-    width: 300,
-    height: 600,
+    width: 200,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  logoImage: {
+    width: 200,
+    height: 200,
   },
 });

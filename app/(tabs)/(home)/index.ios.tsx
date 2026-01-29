@@ -112,7 +112,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
-          <HushLogo size="small" color={colors.primary} />
+          <HushLogo size="small" />
           <View style={styles.headerTextContainer}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>HUSH</Text>
             <Text style={[styles.headerSubtitle, { color: colors.primary }]}>
