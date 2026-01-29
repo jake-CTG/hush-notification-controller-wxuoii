@@ -1,3 +1,4 @@
+
 {
   "project_info": {
     "project_number": "947286702792",
@@ -9,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:947286702792:android:eb7d2c9e253d51a62b43fd",
         "android_client_info": {
-          "package_name": "com.CherryPi.HUSH"
+          "package_name": "com.CherryPi.Hush"
         }
       },
       "oauth_client": [],
