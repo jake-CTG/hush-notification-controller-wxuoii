@@ -17,7 +17,7 @@ import { useAppTheme } from '@/contexts/ThemeContext';
 import { IconSymbol } from '@/components/IconSymbol';
 import { HushLogo } from '@/components/HushLogo';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
-import { getInstalledApps, InstalledApp } from '@/modules/installed-apps';
+import { getInstalledApps, InstalledApp, openAppNotificationSettings } from '@/modules/installed-apps';
 
 interface App {
   id: string;
@@ -80,7 +80,7 @@ export default function HomeScreen() {
             .map((app: InstalledApp, index: number) => ({
               id: app.packageName || `app-${index}`,
               name: app.appName,
-              icon: app.icon, // base64 encoded icon
+              icon: app.icon,
               packageName: app.packageName,
               notificationsEnabled: app.notificationsEnabled,
             }))
@@ -120,13 +120,47 @@ export default function HomeScreen() {
   const navigateToAppDetail = async (app: App) => {
     console.log('User tapped on app:', app.name);
     
-    setIsShowingAd(true);
-    
-    const adShown = await showAd();
-    
-    if (adShown) {
-      console.log('Interstitial ad shown, waiting for user to close');
-      setTimeout(() => {
+    if (Platform.OS === 'android' && app.packageName) {
+      console.log('Opening system notification settings for:', app.packageName);
+      
+      setIsShowingAd(true);
+      
+      const adShown = await showAd();
+      
+      if (adShown) {
+        console.log('Interstitial ad shown, waiting for user to close');
+        setTimeout(async () => {
+          setIsShowingAd(false);
+          await openAppNotificationSettings(app.packageName!);
+        }, 500);
+      } else {
+        console.log('Ad not shown, opening settings directly');
+        setIsShowingAd(false);
+        await openAppNotificationSettings(app.packageName);
+      }
+    } else {
+      console.log('iOS or no package name - navigating to detail screen');
+      
+      setIsShowingAd(true);
+      
+      const adShown = await showAd();
+      
+      if (adShown) {
+        console.log('Interstitial ad shown, waiting for user to close');
+        setTimeout(() => {
+          setIsShowingAd(false);
+          router.push({
+            pathname: '/app-detail',
+            params: { 
+              appId: app.id, 
+              appName: app.name, 
+              appIcon: app.icon,
+              packageName: app.packageName || '',
+            },
+          });
+        }, 500);
+      } else {
+        console.log('Ad not shown, navigating directly');
         setIsShowingAd(false);
         router.push({
           pathname: '/app-detail',
@@ -137,19 +171,7 @@ export default function HomeScreen() {
             packageName: app.packageName || '',
           },
         });
-      }, 500);
-    } else {
-      console.log('Ad not shown, navigating directly');
-      setIsShowingAd(false);
-      router.push({
-        pathname: '/app-detail',
-        params: { 
-          appId: app.id, 
-          appName: app.name, 
-          appIcon: app.icon,
-          packageName: app.packageName || '',
-        },
-      });
+      }
     }
   };
 
